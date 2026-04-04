@@ -1,0 +1,258 @@
+/* ── Design Tokens ─────────────────────────────────────── */
+:root {
+  --green:        #C7D94D;
+  --green-dim:    rgba(199, 217, 77, 0.15);
+  --green-glow:   rgba(199, 217, 77, 0.4);
+  --black:        #050505;
+  --dark:         #0c0c0c;
+  --dark2:        #111111;
+  --grey:         #ebebeb;
+  --white:        #f5f5f5;
+  --text-muted:   #888888;
+  --border:       rgba(199, 217, 77, 0.2);
+
+  --font-display: 'Orbitron', sans-serif;
+  --font-body:    'Montserrat', sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --transition:   all 0.3s var(--ease-out-expo);
+}
+
+/* ── Reset ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--black);
+  color: var(--white);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--black); }
+::-webkit-scrollbar-thumb { background: var(--green); border-radius: 3px; }
+
+/* ── Typography ─────────────────────────────────────────── */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img, video {
+  display: block;
+  max-width: 100%;
+}
+
+/* ── Performance: skip layout/paint for off-screen sections ─ */
+/* Browser will NOT render these until they approach the viewport */
+#services, #process, #stats, #projects, #testimonials, #contact, footer {
+  content-visibility: auto;
+  /* Hint to browser how tall the section roughly is, prevents scroll jumps */
+  contain-intrinsic-size: 0 700px;
+}
+
+/* GPU-composite the marquee tracks so scrolling is off the main thread */
+.marquee-track {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* ── Utility ─────────────────────────────────────────────── */
+.green { color: var(--green); }
+
+.section-label {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: var(--green);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.2rem;
+}
+
+.section-label::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: var(--green);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 36px;
+  background: var(--green);
+  color: var(--black);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+
+.btn-primary:hover {
+  background: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px var(--green-glow);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: transparent;
+  color: var(--green);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: 1px solid var(--green);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-outline:hover {
+  background: var(--green);
+  color: var(--black);
+}
+
+/* ── Circuit background pattern ─────────────────────────── */
+.circuit-bg {
+  position: relative;
+}
+
+.circuit-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image:
+    linear-gradient(var(--green) 1px, transparent 1px),
+    linear-gradient(90deg, var(--green) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+/* ── Fade in animation ───────────────────────────────────── */
+.fade-up {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+/* ── Marquee animation ───────────────────────────────────── */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(var(--marquee-width)); }
+}
+
+.marquee-track {
+  display: flex;
+  gap: 24px;
+  width: max-content;
+  padding-left: 24px;
+  animation: marquee-scroll 22s linear infinite;
+  will-change: transform;
+}
+
+.marquee-track:hover,
+.marquee-paused .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ─────────────────────────────────────────────────────────── */
+/* ── Responsive Breakpoints ─────────────────────────────── */
+/* ─────────────────────────────────────────────────────────── */
+
+/* ── Mobile (≤ 767px) ───────────────────────────────────── */
+@media (max-width: 767px) {
+
+  /* Global type scale */
+  h1 { font-size: clamp(2.2rem, 9vw, 3.5rem) !important; }
+  h2 { font-size: clamp(1.5rem, 7vw, 2.4rem) !important; }
+
+  /* Tighten section side padding site-wide */
+  section {
+    padding-left: clamp(16px, 5vw, 32px) !important;
+    padding-right: clamp(16px, 5vw, 32px) !important;
+  }
+
+  /* Marquee cards: narrower */
+  .marquee-track { gap: 14px !important; }
+  .marquee-track > div { flex: 0 0 260px !important; }
+
+  /* Contact form grids collapse to single column */
+  .contact-form-row {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Contact stat strip: stack */
+  .contact-stat-strip {
+    grid-template-columns: 1fr !important;
+  }
+  .contact-stat-strip > div {
+    border-left: none !important;
+    border-top: 1px solid rgba(199,217,77,0.1) !important;
+  }
+  .contact-stat-strip > div:first-child {
+    border-top: none !important;
+    background: rgba(199,217,77,0.06) !important;
+  }
+
+  /* Projects grid: single col */
+  .projects-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Buttons: tighter padding on mobile */
+  .btn-primary, .btn-outline {
+    padding: 13px 24px !important;
+    font-size: 0.72rem !important;
+  }
+}
+
+/* ── Small mobile (≤ 480px) ─────────────────────────────── */
+@media (max-width: 480px) {
+  h2 { font-size: clamp(1.3rem, 8vw, 2rem) !important; }
+
+  .marquee-track > div {
+    flex: 0 0 220px !important;
+    padding: 18px 14px !important;
+    font-size: 0.82rem !important;
+  }
+
+  .btn-primary, .btn-outline {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
