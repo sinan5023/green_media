@@ -105,10 +105,13 @@ export default function ProjectsSection() {
                 </p>
             </div>
 
-            <div ref={gridRef} style={{
+            <div ref={gridRef} className="projects-grid" style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-                gap: 3,
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: 4,
+                width: '90%',
+                maxWidth: 1400,
+                margin: '0 auto',
             }}>
                 {PROJECTS.map((p) => (
                     <div
@@ -142,7 +145,7 @@ export default function ProjectsSection() {
                             alt={p.title}
                             style={{
                                 width: '100%',
-                                height: 300,
+                                aspectRatio: '16 / 10',
                                 objectFit: 'cover',
                                 display: 'block',
                                 transformOrigin: 'center',

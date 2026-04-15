@@ -32,8 +32,8 @@ const TESTIMONIALS = [
     },
 ]
 
-// Triple the items for a seamless, fully-populated marquee loop
-const MARQUEE_ITEMS = [...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS]
+// 5x duplication for seamless loop on ultra-wide viewports
+const MARQUEE_ITEMS = [...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS]
 
 function StarRating({ count }) {
     return (

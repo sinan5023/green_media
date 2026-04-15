@@ -36,8 +36,8 @@ const SERVICES = [
     },
 ]
 
-// Duplicate for seamless infinite scroll
-const MARQUEE_ITEMS = [...SERVICES, ...SERVICES]
+// Quadruple for seamless infinite scroll on ultra-wide viewports
+const MARQUEE_ITEMS = [...SERVICES, ...SERVICES, ...SERVICES, ...SERVICES]
 
 function ServiceCard({ service, index }) {
     const cardRef  = useRef(null)
