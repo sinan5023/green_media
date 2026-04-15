@@ -1,15 +1,18 @@
 import { useEffect, useRef } from 'react'
+import isMobileDevice from '../hooks/useMobile'
 
 const PARTICLE_COLOR_BASE = [199, 217, 77]
-const TEXT       = 'GREEN MEDIA'
-const ANGLE_DEG  = -22
 // Reduce count on low-power devices
 const PARTICLE_COUNT = window.matchMedia('(max-width: 768px)').matches ? 1200 : 2500
 
 export default function ParticleCanvas({ triggerRef }) {
     const canvasRef = useRef(null)
+    // Mobile: skip the entire particle animation — saves 1200+ objects + 60fps rAF loop
+    const mobile = isMobileDevice()
 
     useEffect(() => {
+        if (mobile) return  // nothing to set up
+
         const canvas = canvasRef.current
         if (!canvas) return
         const ctx = canvas.getContext('2d', { alpha: true })
@@ -19,7 +22,6 @@ export default function ParticleCanvas({ triggerRef }) {
         canvas.width  = W
         canvas.height = H
 
-        let hovered  = false
         let animId   = null
         let running  = false   // controlled by IntersectionObserver
 
@@ -48,19 +50,13 @@ export default function ParticleCanvas({ triggerRef }) {
             }
 
             update() {
-                if (hovered) {
-                    this.x += (this.tx - this.x) * this.ease
-                    this.y += (this.ty - this.y) * this.ease
-                    this.alpha += (0.9 - this.alpha) * 0.1
-                } else {
-                    this.x += this.vx
-                    this.y += this.vy
-                    if (this.x < -4) this.x = W + 4
-                    if (this.x > W + 4) this.x = -4
-                    if (this.y < -4) this.y = H + 4
-                    if (this.y > H + 4) this.y = -4
-                    this.alpha += (this.baseAlpha - this.alpha) * 0.04
-                }
+                this.x += this.vx
+                this.y += this.vy
+                if (this.x < -4) this.x = W + 4
+                if (this.x > W + 4) this.x = -4
+                if (this.y < -4) this.y = H + 4
+                if (this.y > H + 4) this.y = -4
+                this.alpha += (this.baseAlpha - this.alpha) * 0.04
             }
 
             draw() {
@@ -72,60 +68,8 @@ export default function ParticleCanvas({ triggerRef }) {
             }
         }
 
-        // ── Diagonal text pixel sampler ───────────────────────────
-        function getTextPixels(width, height) {
-            const off  = document.createElement('canvas')
-            off.width  = width
-            off.height = height
-            const oc   = off.getContext('2d')
-            oc.clearRect(0, 0, width, height)
-
-            const diagonal = Math.sqrt(width * width + height * height)
-            const angleRad = (ANGLE_DEG * Math.PI) / 180
-
-            // Binary search for font size that spans ~88% of diagonal
-            let lo = 10, hi = 600, fontSize = 100
-            oc.textAlign    = 'center'
-            oc.textBaseline = 'middle'
-            for (let i = 0; i < 18; i++) {
-                fontSize = (lo + hi) / 2
-                oc.font = `900 ${fontSize}px Orbitron, sans-serif`
-                if (oc.measureText(TEXT).width < diagonal * 0.88) lo = fontSize
-                else hi = fontSize
-            }
-
-            oc.save()
-            oc.translate(width / 2, height / 2)
-            oc.rotate(angleRad)
-            oc.fillStyle = '#fff'
-            oc.fillText(TEXT, 0, 0)
-            oc.restore()
-
-            const data   = oc.getImageData(0, 0, width, height).data
-            const pixels = []
-            const gap    = 6 // sample every 6px — good density, less work
-            for (let y = 0; y < height; y += gap) {
-                for (let x = 0; x < width; x += gap) {
-                    if (data[(y * width + x) * 4 + 3] > 120) pixels.push({ x, y })
-                }
-            }
-            return pixels
-        }
-
         // ── Init particles ────────────────────────────────────────
         const particles = Array.from({ length: PARTICLE_COUNT }, () => new Particle())
-        let textPixels  = []
-
-        function assignTargets() {
-            textPixels = getTextPixels(W, H)
-            const shuffled = textPixels.slice().sort(() => Math.random() - 0.5)
-            const len = shuffled.length
-            particles.forEach((p, i) => {
-                const tp = shuffled[i % len]
-                p.tx = tp.x
-                p.ty = tp.y
-            })
-        }
 
         // ── Render loop ───────────────────────────────────────────
         function render() {
@@ -153,22 +97,6 @@ export default function ParticleCanvas({ triggerRef }) {
         )
         observer.observe(canvas)
 
-        // ── Hover trigger ─────────────────────────────────────────
-        const trigger = (triggerRef?.current) ? triggerRef.current : canvas.parentElement
-
-        trigger.addEventListener('mouseenter', () => {
-            hovered = true
-            assignTargets()
-        })
-        trigger.addEventListener('mouseleave', () => {
-            hovered = false
-            particles.forEach(p => {
-                p.vx = (Math.random() - 0.5) * 1.2
-                p.vy = (Math.random() - 0.5) * 1.2
-                p.baseAlpha = Math.random() * 0.5 + 0.1
-            })
-        })
-
         // ── Resize — debounced via rAF ────────────────────────────
         let resizeRaf = null
         function onResize() {
@@ -179,7 +107,6 @@ export default function ParticleCanvas({ triggerRef }) {
                 canvas.width  = W
                 canvas.height = H
                 particles.forEach(p => p.reset())
-                if (hovered) assignTargets()
             })
         }
         window.addEventListener('resize', onResize, { passive: true })
@@ -191,6 +118,8 @@ export default function ParticleCanvas({ triggerRef }) {
             window.removeEventListener('resize', onResize)
         }
     }, [triggerRef])
+
+    if (mobile) return null
 
     return (
         <canvas

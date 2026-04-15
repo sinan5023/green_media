@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react'
+import isMobileDevice from '../hooks/useMobile'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -44,6 +45,7 @@ function ServiceCard({ service, index }) {
     const rafRef   = useRef(null)   // throttle mousemove to one update per frame
 
     const handleMouseMove = useCallback((e) => {
+        if (isMobileDevice()) return  // skip 3D tilt entirely on touch devices
         if (rafRef.current) return  // already a frame queued — skip
         rafRef.current = requestAnimationFrame(() => {
             rafRef.current = null
@@ -108,14 +110,18 @@ function ServiceCard({ service, index }) {
         if (num) gsap.to(num, { color: 'rgba(199,217,77,0.25)', duration: 0.3 })
     }, [])
 
+    const mobile = isMobileDevice()
+
     return (
         <div
             ref={cardRef}
             onMouseMove={e => {
+                if (mobile) return
                 handleMouseMove(e)
                 e.currentTarget.style.boxShadow = '0 20px 60px rgba(199,217,77,0.12), 0 0 0 1px rgba(199,217,77,0.2)'
             }}
             onMouseLeave={e => {
+                if (mobile) return
                 handleMouseLeave()
                 e.currentTarget.style.boxShadow = 'none'
             }}
@@ -125,8 +131,8 @@ function ServiceCard({ service, index }) {
                 cursor: 'pointer',
                 flex: '0 0 340px',
                 height: 420,
-                transformStyle: 'preserve-3d',
-                willChange: 'transform',
+                transformStyle: mobile ? 'flat' : 'preserve-3d',
+                willChange: mobile ? 'auto' : 'transform',
                 border: '1px solid rgba(199,217,77,0.08)',
                 transition: 'box-shadow 0.4s ease',
             }}
@@ -144,7 +150,7 @@ function ServiceCard({ service, index }) {
                     display: 'block',
                     position: 'absolute',
                     inset: 0,
-                    willChange: 'transform',
+                    willChange: mobile ? 'auto' : 'transform',
                 }}
             />
 
@@ -305,7 +311,8 @@ export default function ServicesSection() {
                 style={{
                     width: '100%',
                     overflow: 'hidden',
-                    perspective: '1000px',
+                    // perspective causes GPU layer compositing; skip on mobile
+                    perspective: isMobileDevice() ? 'none' : '1000px',
                     paddingTop: 20,
                     paddingBottom: 20,
                     position: 'relative',

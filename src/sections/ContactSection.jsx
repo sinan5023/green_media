@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import ParticleCanvas from '../components/ParticleCanvas'
+import isMobileDevice from '../hooks/useMobile'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -223,10 +224,12 @@ export default function ContactSection() {
                         cursor: item.href ? 'pointer' : 'default',
                     }}
                         onMouseEnter={e => {
+                            if (isMobileDevice()) return
                             e.currentTarget.style.borderColor = 'rgba(199,217,77,0.3)'
                             e.currentTarget.style.background = 'rgba(199,217,77,0.04)'
                         }}
                         onMouseLeave={e => {
+                            if (isMobileDevice()) return
                             e.currentTarget.style.borderColor = 'rgba(199,217,77,0.12)'
                             e.currentTarget.style.background = 'rgba(255,255,255,0.025)'
                         }}

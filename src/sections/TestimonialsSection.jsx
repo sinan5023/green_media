@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react'
+import isMobileDevice from '../hooks/useMobile'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -52,6 +53,7 @@ function TestimonialCard({ item }) {
     const rafRef   = useRef(null)
 
     const handleMouseMove = useCallback((e) => {
+        if (isMobileDevice()) return  // skip 3D tilt on touch
         const card = cardRef.current
         if (!card) return
         if (rafRef.current) return
@@ -92,11 +94,13 @@ function TestimonialCard({ item }) {
         if (glareRef.current) glareRef.current.style.background = 'transparent'
     }, [])
 
+    const mobile = isMobileDevice()
+
     return (
         <div
             ref={cardRef}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
+            onMouseMove={mobile ? undefined : handleMouseMove}
+            onMouseLeave={mobile ? undefined : handleMouseLeave}
             style={{
                 flex: '0 0 360px',
                 padding: '32px 28px',
@@ -104,8 +108,8 @@ function TestimonialCard({ item }) {
                 border: '1px solid rgba(199,217,77,0.1)',
                 position: 'relative',
                 overflow: 'hidden',
-                transformStyle: 'preserve-3d',
-                willChange: 'transform',
+                transformStyle: mobile ? 'flat' : 'preserve-3d',
+                willChange: mobile ? 'auto' : 'transform',
                 cursor: 'default',
                 transition: 'border-color 0.3s, box-shadow 0.35s',
             }}
@@ -251,7 +255,7 @@ export default function TestimonialsSection() {
             </div>
 
             {/* Marquee wrapper */}
-            <div style={{ width: '100%', overflow: 'hidden', perspective: '1000px', paddingTop: 16, paddingBottom: 16, position: 'relative' }}>
+            <div style={{ width: '100%', overflow: 'hidden', perspective: isMobileDevice() ? 'none' : '1000px', paddingTop: 16, paddingBottom: 16, position: 'relative' }}>
                 <div
                     ref={trackRef}
                     className="marquee-track"

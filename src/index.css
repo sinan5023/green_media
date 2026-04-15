@@ -38,11 +38,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--black); }
-::-webkit-scrollbar-thumb { background: var(--green); border-radius: 3px; }
-
 /* ── Typography ─────────────────────────────────────────── */
 h1, h2, h3, h4 {
   font-family: var(--font-display);
@@ -256,3 +251,60 @@ img, video {
   }
 }
 
+
+/* ── Mobile Performance: disable expensive animations & effects ── */
+/* Targets touch devices (no accurate hover anyway) */
+@media (pointer: coarse), (max-width: 767px) {
+
+  /* 1. Kill all hover-only transitions — they fire on tap and cause jank */
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0s !important;
+  }
+
+  /* Re-enable ONLY transitions needed for interactive UX (burger menu, overlay) */
+  .nav-hamburger,
+  .nav-hamburger span {
+    transition-duration: 0.25s !important;
+  }
+
+  /* 2. Remove will-change (GPU layers cost RAM on mobile) */
+  .marquee-track,
+  [style*="will-change"] {
+    will-change: auto !important;
+  }
+
+  /* 3. Remove perspective compositing layers from marquee wrappers */
+  [style*="perspective"] {
+    perspective: none !important;
+  }
+
+  /* 4. Hide hero background video — saves ~8 MB network + GPU decode cost.
+        The dark gradient overlay remains so the section still looks great. */
+  #home video {
+    display: none !important;
+  }
+
+  /* 5. Pause the scroll-hint pulse — small saving but no visual loss on mobile */
+  #home [style*="scrollPulse"] {
+    animation: none !important;
+    opacity: 0.5 !important;
+  }
+
+  /* 6. Speed up marquee slightly on small screens (less distance to travel) */
+  .marquee-track {
+    animation-duration: 16s !important;
+  }
+
+  /* 7. Flatten 3D stacking contexts globally */
+  * {
+    transform-style: flat !important;
+    backface-visibility: visible !important;
+  }
+
+  /* Restore specific exceptions that need normal 3D (intro curtains) */
+  #home > div {
+    transform-style: unset !important;
+  }
+}

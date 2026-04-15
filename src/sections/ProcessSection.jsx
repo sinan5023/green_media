@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import isMobileDevice from '../hooks/useMobile'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -63,6 +64,7 @@ function StepCard({ step, index, elRef }) {
     const cardRef = useRef(null)
 
     const onEnter = () => {
+        if (isMobileDevice()) return
         // Direct style mutation — instantaneous, no tween queue
         if (barRef.current) {
             barRef.current.style.transform = 'scaleY(1)'
@@ -75,6 +77,7 @@ function StepCard({ step, index, elRef }) {
     }
 
     const onLeave = () => {
+        if (isMobileDevice()) return
         if (barRef.current) {
             barRef.current.style.transform = 'scaleY(0)'
         }
