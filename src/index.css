@@ -182,9 +182,12 @@ img, video {
   will-change: transform;
 }
 
-.marquee-track:hover,
-.marquee-paused .marquee-track {
-  animation-play-state: paused;
+/* Only pause on true hover (mouse/trackpad) — never on touch */
+@media (hover: hover) and (pointer: fine) {
+  .marquee-track:hover,
+  .marquee-paused .marquee-track {
+    animation-play-state: paused;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────── */
@@ -299,6 +302,13 @@ img, video {
   /* 6. Speed up marquee slightly on small screens (less distance to travel) */
   .marquee-track {
     animation-duration: 16s !important;
+    /* Ensure touch never pauses the marquee */
+    animation-play-state: running !important;
+  }
+
+  /* Make marquee cards non-interactive on mobile — no hover, no tap interference */
+  .marquee-track > * {
+    pointer-events: none !important;
   }
 
   /* 7. Flatten 3D stacking contexts globally */
