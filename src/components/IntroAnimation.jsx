@@ -204,50 +204,24 @@ export default function IntroAnimation({ onComplete }) {
             {/* ── Loading state — z4 (covers everything until video ready) ── */}
             <div ref={loaderRef} style={{
                 position: 'absolute', inset: 0, zIndex: 4,
-                display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center',
                 background: '#050505',
             }}>
-                {/* Pulsing logo */}
-                <img
-                    src="/favicon.jpg"
-                    alt="Green Media"
-                    style={{
-                        width: 64,
-                        height: 64,
-                        borderRadius: '50%',
-                        marginBottom: 32,
-                        animation: 'introLogoPulse 1.8s ease-in-out infinite',
-                        filter: 'drop-shadow(0 0 18px rgba(199,217,77,0.35))',
-                    }}
-                />
-
-                {/* Progress bar track */}
+                {/* Full-width progress bar — pinned to bottom */}
                 <div style={{
-                    width: 'min(60vw, 220px)',
-                    height: 2,
-                    background: 'rgba(199,217,77,0.12)',
-                    borderRadius: 1,
+                    position: 'absolute',
+                    bottom: 0, left: 0, right: 0,
+                    height: 4,
+                    background: 'rgba(199,217,77,0.06)',
                     overflow: 'hidden',
                 }}>
-                    {/* Progress bar fill */}
                     <div ref={progressRef} style={{
                         width: '100%',
                         height: '100%',
-                        background: 'linear-gradient(90deg, rgba(199,217,77,0.6), #C7D94D)',
-                        borderRadius: 1,
+                        background: 'linear-gradient(90deg, #C7D94D 0%, #C7D94D 85%, rgba(199,217,77,0.3) 95%, transparent 100%)',
                         transform: 'scaleX(0)',
                         transformOrigin: 'left center',
                     }} />
                 </div>
-
-                {/* Inline keyframes for the logo pulse */}
-                <style>{`
-                    @keyframes introLogoPulse {
-                        0%, 100% { opacity: 0.5; transform: scale(1); }
-                        50%      { opacity: 1;   transform: scale(1.08); }
-                    }
-                `}</style>
             </div>
         </div>
     )
